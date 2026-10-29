@@ -563,6 +563,103 @@ html { scrollbar-color: var(--ink-3) var(--bg); }
   font-size: 1rem;
 }
 
+/* ---------- Promos ---------- */
+.promos__grid { display: grid; gap: 12px; }
+@media (min-width: 1024px) { .promos__grid { grid-template-columns: 1.25fr 1fr; gap: 16px; } }
+
+.promo {
+  display: flex;
+  flex-direction: column;
+  padding: 28px 22px 22px;
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: var(--radius-lg);
+}
+@media (min-width: 720px) { .promo { padding: 40px 40px 32px; } }
+
+/* Главная акция — в цвете салона, как карточка записи. */
+.promo--accent { background: var(--accent); border-color: var(--accent); color: var(--accent-ink); }
+
+.promo__title {
+  max-width: 22ch;
+  font-size: clamp(1.25rem, 1.1rem + 0.6vw, 1.625rem);
+  font-weight: 500;
+  line-height: 1.25;
+  letter-spacing: -0.01em;
+  text-wrap: balance;
+}
+
+.promo__offers { margin-top: 22px; }
+.promo__offer {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 4px 18px;
+  padding: 10px 0;
+  border-top: 1px solid var(--line);
+}
+.promo--accent .promo__offer, .promo--accent .promo__extra { border-color: color-mix(in oklab, var(--accent-ink) 22%, transparent); }
+.promo__value {
+  flex: none;
+  min-width: 3.3ch;
+  font-family: var(--serif);
+  font-size: clamp(3rem, 2.2rem + 3vw, 5rem);
+  font-weight: 400;
+  line-height: 0.95;
+  letter-spacing: -0.02em;
+  font-variant-numeric: lining-nums tabular-nums;
+  color: var(--accent);
+}
+.promo--accent .promo__value { color: var(--accent-ink); }
+.promo__cond { font-size: 1rem; color: var(--ink-2); }
+.promo--accent .promo__cond { color: color-mix(in oklab, var(--accent-ink) 82%, var(--accent)); }
+
+.promo__extra {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding-top: 16px;
+  border-top: 1px solid var(--line);
+  font-family: var(--serif);
+  font-style: italic;
+  font-size: 1.75rem;
+  line-height: 1;
+}
+.promo__extra .icon { width: 26px; height: 26px; }
+.promo__text { padding-top: 16px; border-top: 1px solid var(--line); color: var(--ink-2); }
+/* Карточка с фото: текст слева, фото справа во всю высоту текста. На телефоне кнопка уходит под них. */
+.promo--photo {
+  display: grid;
+  grid-template-columns: 1fr minmax(0, 38%);
+  grid-template-areas: "body media" "foot foot";
+  column-gap: 18px;
+}
+.promo__body { grid-area: body; display: flex; flex-direction: column; min-width: 0; }
+.promo--photo .promo__foot { grid-area: foot; }
+.promo__media { grid-area: media; position: relative; min-height: 200px; overflow: hidden; border-radius: var(--radius-md); background: var(--frame); }
+.promo__media img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; object-position: 50% 30%; }
+@media (min-width: 720px) {
+  .promo--photo { grid-template-columns: 1fr minmax(0, 42%); grid-template-areas: "body media" "foot media"; column-gap: 32px; }
+}
+/* Последняя карточка без пары растягивается на всю ширину, фото у неё — узкая полоса. */
+@media (min-width: 1024px) {
+  .promo--photo:last-child:nth-child(odd) { grid-column: 1 / -1; grid-template-columns: 1fr 280px; }
+  .promo--photo:last-child:nth-child(odd) .promo__title { max-width: none; }
+}
+
+.promo__foot {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  margin-top: auto;
+  padding-top: 32px;
+}
+.promo__until { display: inline-flex; align-items: center; gap: 8px; font-size: 0.9375rem; font-weight: 500; }
+.promo__until .icon { width: 20px; height: 20px; }
+@media (max-width: 479px) { .promo__cta { width: 100%; justify-content: space-between; } }
+
 /* ---------- Services ---------- */
 .carousel-nav { display: none; gap: 10px; flex: none; }
 @media (min-width: 720px) { .carousel-nav:not([hidden]) { display: flex; } }
@@ -878,8 +975,8 @@ html { scrollbar-color: var(--ink-3) var(--bg); }
 /* ---------- Booking ---------- */
 .booking__card {
   display: grid;
-  gap: 36px;
-  padding: 32px 20px 24px;
+  gap: 32px;
+  padding: 32px 20px 20px;
   border-radius: var(--radius-lg);
   background: var(--accent);
   color: var(--accent-ink);
@@ -889,248 +986,73 @@ html { scrollbar-color: var(--ink-3) var(--bg); }
   max-width: 40ch;
   color: color-mix(in oklab, var(--accent-ink) 82%, var(--accent));
 }
-.booking__alt { margin-top: 28px; display: grid; gap: 12px; }
-.booking__alt-title { font-size: 0.875rem; color: color-mix(in oklab, var(--accent-ink) 78%, var(--accent)); }
-.booking__alt-links { display: flex; flex-wrap: wrap; gap: 8px; }
-.alt-link {
-  display: inline-flex;
-  align-items: center;
-  gap: 8px;
-  min-height: 44px;
-  padding: 0 16px;
-  border: 1px solid color-mix(in oklab, var(--accent-ink) 40%, transparent);
-  border-radius: 999px;
-  font-size: 0.875rem;
-  text-decoration: none;
-  transition: background-color 0.25s;
-}
-.alt-link:hover { background: color-mix(in oklab, var(--accent-ink) 12%, transparent); }
 
-.form__grid { display: grid; gap: 16px; }
-.field { display: grid; gap: 8px; min-width: 0; border: 0; margin: 0; padding: 0; }
-.field label, .field legend {
-  padding: 0;
-  font-size: 0.875rem;
-  font-weight: 500;
-}
-.field legend { margin-bottom: 8px; }
-.field__opt { font-weight: 400; color: color-mix(in oklab, var(--accent-ink) 72%, var(--accent)); }
-
-.field input:not([type="checkbox"]):not([type="radio"]),
-.field select,
-.field textarea {
-  width: 100%;
-  min-height: 52px;
-  padding: 13px 16px;
-  border: 1.5px solid transparent;
-  border-radius: var(--radius-sm);
-  background: #fff;
-  color: var(--ink);
-  font-size: 1rem;
-  transition: border-color 0.2s, box-shadow 0.2s;
-}
-.field textarea { resize: vertical; min-height: 96px; }
-.field select {
-  appearance: none;
-  -webkit-appearance: none;
-  padding-right: 44px;
-  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%231d1d1b' stroke-width='1.5' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M7 10l5 5 5-5'/%3E%3C/svg%3E");
-  background-repeat: no-repeat;
-  background-position: right 14px center;
-  background-size: 20px;
-  cursor: pointer;
-}
-.field input::placeholder, .field textarea::placeholder { color: #77736c; }
-.field input:focus-visible, .field select:focus-visible, .field textarea:focus-visible {
-  outline: none;
-  border-color: var(--ink);
-  box-shadow: 0 0 0 4px color-mix(in oklab, var(--accent-ink) 30%, transparent);
-}
-.field.is-invalid input, .field.is-invalid select { border-color: #b3261e; }
-.field__error {
-  display: none;
-  font-size: 0.8125rem;
-  font-weight: 500;
-  color: #fff;
-}
-.field.is-invalid .field__error {
-  display: flex;
-  align-items: center;
-  gap: 6px;
-}
-.field.is-invalid .field__error::before {
-  content: "";
-  flex: none;
-  width: 6px;
-  height: 6px;
-  border-radius: 50%;
-  background: #ffb4ab;
-}
-
-.chips { display: flex; flex-wrap: wrap; gap: 8px; }
-.chip input { position: absolute; opacity: 0; pointer-events: none; }
-.chip span {
-  display: inline-flex;
-  align-items: center;
-  min-height: 44px;
-  padding: 0 18px;
-  border: 1px solid color-mix(in oklab, var(--accent-ink) 45%, transparent);
-  border-radius: 999px;
-  font-size: 0.875rem;
-  cursor: pointer;
-  transition: background-color 0.2s, color 0.2s, border-color 0.2s;
-}
-.chip input:checked + span { background: #fff; color: var(--ink); border-color: #fff; }
-.chip input:focus-visible + span { outline: 2px solid #fff; outline-offset: 3px; }
-
-/* Выбор времени: переключатель периода и окна по 15 минут, по часу в ряд. */
-.slots__periods {
+/* Запись через мессенджеры и звонок: крупные строки, на наведении — белая плашка, как у светлой кнопки. */
+.booking__channels { display: grid; gap: 10px; align-content: center; }
+.channel {
   display: grid;
-  grid-auto-flow: column;
-  grid-auto-columns: 1fr;
-  gap: 4px;
-  padding: 4px;
-  border-radius: 999px;
-  background: color-mix(in oklab, var(--accent-ink) 12%, transparent);
-}
-.slots__period {
-  display: grid;
-  place-content: center;
-  gap: 1px;
-  min-height: 52px;
-  padding: 4px 8px;
-  border: 0;
-  border-radius: 999px;
-  background: transparent;
+  grid-template-columns: auto minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 12px;
+  min-height: 76px;
+  padding: 12px 12px 12px 12px;
+  border: 1px solid color-mix(in oklab, var(--accent-ink) 30%, transparent);
+  border-radius: var(--radius-md);
   color: inherit;
-  line-height: 1.2;
-  cursor: pointer;
-  transition: background-color 0.25s var(--ease-out), color 0.25s var(--ease-out);
+  text-decoration: none;
+  transition: background-color 0.3s var(--ease-out), color 0.3s var(--ease-out), border-color 0.3s var(--ease-out);
 }
-.slots__period:hover { background: color-mix(in oklab, var(--accent-ink) 10%, transparent); }
-.slots__period-name { font-size: 0.9375rem; font-weight: 500; }
-.slots__period-range { font-size: 0.8125rem; color: color-mix(in oklab, var(--accent-ink) 72%, var(--accent)); font-variant-numeric: tabular-nums; }
-.slots__period[aria-pressed="true"] { background: #fff; color: var(--ink); }
-.slots__period[aria-pressed="true"] .slots__period-range { color: var(--ink-2); }
-.slots__period:focus-visible { outline: 2px solid #fff; outline-offset: 2px; border-radius: 999px; }
-
-.slots__group {
-  display: grid;
-  grid-template-columns: repeat(4, minmax(0, 1fr));
-  gap: 8px;
-  margin-top: 12px;
-}
-.slot input { position: absolute; opacity: 0; pointer-events: none; }
-.slots__empty { display: none; grid-column: 1 / -1; padding: 18px 4px; font-size: 0.875rem; text-align: center; color: color-mix(in oklab, var(--accent-ink) 78%, var(--accent)); }
-.slots__group.is-past .slot { display: none; }
-.slots__group.is-past .slots__empty { display: block; }
-.slot__face {
+.channel__icon {
   display: grid;
   place-items: center;
-  align-content: center;
-  min-height: 56px;
-  padding: 6px 4px;
-  border: 1px solid color-mix(in oklab, var(--accent-ink) 35%, transparent);
-  border-radius: var(--radius-sm);
-  line-height: 1.2;
-  font-variant-numeric: tabular-nums;
-  cursor: pointer;
-  transition: background-color 0.2s, color 0.2s, border-color 0.2s, transform 0.2s var(--ease-out);
-}
-.slot__from { font-size: 1rem; font-weight: 600; letter-spacing: 0.01em; }
-.slot__to { font-size: 0.8125rem; color: color-mix(in oklab, var(--accent-ink) 72%, var(--accent)); }
-.slot:hover .slot__face { background: color-mix(in oklab, var(--accent-ink) 10%, transparent); }
-.slot input:checked + .slot__face { background: #fff; border-color: #fff; color: var(--ink); }
-.slot input:checked + .slot__face .slot__to { color: var(--accent); font-weight: 600; }
-.slot input:active:not(:disabled) + .slot__face { transform: scale(0.97); }
-.slot input:focus-visible + .slot__face { outline: 2px solid #fff; outline-offset: 3px; }
-.slot input:disabled + .slot__face { opacity: 0.35; cursor: not-allowed; }
-.slot input:disabled + .slot__face .slot__from { text-decoration: line-through; text-decoration-thickness: 1px; }
-.slot:has(input:disabled):hover .slot__face { background: transparent; }
-
-.slots__summary {
-  display: flex;
-  flex-wrap: wrap;
-  align-items: center;
-  gap: 4px 12px;
-  min-height: 44px;
-  margin-top: 8px;
-  font-size: 0.9375rem;
-}
-.slots__summary .is-set { font-weight: 600; }
-.slots__reset {
-  min-height: 44px;
-  padding: 0 4px;
-  border: 0;
-  background: none;
-  color: inherit;
-  font-size: 0.875rem;
-  text-decoration: underline;
-  text-underline-offset: 0.2em;
-  cursor: pointer;
-}
-.slots__note { font-size: 0.8125rem; line-height: 1.5; color: color-mix(in oklab, var(--accent-ink) 72%, var(--accent)); }
-
-.consent {
-  display: grid !important;
-  grid-template-columns: 22px 1fr;
-  gap: 12px;
-  align-items: start;
-  font-weight: 400 !important;
-  font-size: 0.875rem !important;
-  line-height: 1.5;
-  cursor: pointer;
-}
-.consent input {
-  width: 22px;
-  height: 22px;
-  margin: 0;
-  accent-color: var(--ink);
-  cursor: pointer;
-}
-.consent a { color: inherit; text-decoration: underline; }
-
-.hp { position: absolute !important; left: -9999px; width: 1px; height: 1px; overflow: hidden; }
-
-.btn--submit { margin-top: 24px; width: 100%; justify-content: space-between; min-height: 60px; padding-left: 28px; font-size: 1rem; }
-.btn--submit:disabled { cursor: progress; opacity: 0.85; }
-.btn--submit.is-loading .btn__chip .icon { display: none; }
-.btn--submit.is-loading .btn__chip::after {
-  content: "";
-  width: 18px;
-  height: 18px;
-  border: 2px solid rgba(255, 255, 255, 0.35);
-  border-top-color: #fff;
+  width: 44px;
+  height: 44px;
   border-radius: 50%;
-  animation: spin 0.8s linear infinite;
+  background: color-mix(in oklab, var(--accent-ink) 12%, transparent);
+  transition: background-color 0.3s var(--ease-out), color 0.3s var(--ease-out);
 }
-@keyframes spin { to { transform: rotate(360deg); } }
+.channel__icon .icon { width: 22px; height: 22px; }
+.channel__text { display: grid; gap: 2px; min-width: 0; }
+.channel__name {
+  font-family: var(--serif);
+  font-size: clamp(1.25rem, 0.9rem + 1.6vw, 1.5rem);
+  font-weight: 400;
+  line-height: 1.1;
+  font-variant-numeric: lining-nums;
+  white-space: nowrap;
+}
+.channel__hint { font-size: 0.8125rem; color: color-mix(in oklab, var(--accent-ink) 80%, var(--accent)); }
+.channel .btn__chip { background: var(--accent-ink); color: var(--accent); }
+.channel:hover { background: #fff; color: var(--ink); border-color: #fff; }
+.channel:hover .channel__icon { background: color-mix(in oklab, var(--accent) 10%, #fff); color: var(--accent); }
+.channel:hover .channel__hint { color: var(--ink-2); }
+.channel:hover .btn__chip { background: var(--accent); color: var(--accent-ink); transform: translateX(3px) rotate(-45deg); }
+.channel:focus-visible { outline: 2px solid #fff; outline-offset: 3px; }
 
-.form__status:empty { display: none; }
-.form__status {
-  margin-top: 16px;
-  padding: 16px 18px;
-  border-radius: var(--radius-sm);
-  background: #fff;
-  color: var(--ink);
-  font-size: 0.9375rem;
-  line-height: 1.5;
+/* Онлайн-запись — главный способ: белая плашка сразу, с отступом от мессенджеров. */
+.channel--primary { background: #fff; color: var(--ink); border-color: #fff; margin-bottom: 14px; }
+.channel--primary .channel__icon { background: var(--accent); color: var(--accent-ink); }
+.channel--primary .channel__name { white-space: normal; }
+
+/* Самые узкие телефоны: номер телефона должен влезть в одну строку рядом со стрелкой. */
+@media (max-width: 359px) {
+  .channel { gap: 10px; padding: 10px; }
+  .channel__icon { width: 40px; height: 40px; }
+  .channel__name { font-size: 1.125rem; }
 }
-.form__status strong { display: block; margin-bottom: 4px; font-weight: 600; }
-.form__status p + p { margin-top: 6px; }
-.form__status code { font-size: 0.85em; padding: 1px 5px; border-radius: 4px; background: var(--bg); }
-.form__status--error strong { color: #b3261e; }
-.form__status--success strong { color: var(--accent); }
+.channel--primary .channel__hint { color: var(--ink-2); }
+.channel--primary .btn__chip { background: var(--accent); color: var(--accent-ink); }
+.channel--primary:hover { background: var(--bg); border-color: var(--bg); }
+.channel--primary:hover .channel__icon { background: var(--accent); color: var(--accent-ink); }
 
 @media (min-width: 720px) {
   .booking__card { padding: 48px; }
-  .form__grid { grid-template-columns: 1fr 1fr; gap: 20px 16px; }
-  .field--wide { grid-column: 1 / -1; }
-  .btn--submit { width: auto; min-width: 280px; }
+  .channel { min-height: 88px; padding: 16px 16px 16px 18px; gap: 20px; }
+  .channel__icon { width: 48px; height: 48px; }
+  .channel__name { font-size: 1.75rem; }
 }
 @media (min-width: 1024px) {
-  .booking__card { grid-template-columns: 0.9fr 1.1fr; gap: 64px; padding: 64px; }
-  .booking__intro { position: sticky; top: calc(var(--header-h) + 40px); align-self: start; }
+  .booking__card { grid-template-columns: 0.9fr 1.1fr; gap: 64px; padding: 64px; align-items: center; }
 }
 
 /* ---------- Contacts ---------- */
@@ -1324,7 +1246,6 @@ html { scrollbar-color: var(--ink-3) var(--bg); }
   .js .hero__aside, .js .hero__main { animation: soft-in 1s 0.35s var(--ease-out) both; }
   .js .quickbook { animation: soft-in 1s 0.5s var(--ease-out) both; }
 
-  .js .slots__group:not([hidden]) .slot { animation: soft-in 0.45s calc(var(--i, 0) * 14ms) var(--ease-out) both; }
 
   .js .service-card.reveal:nth-child(2) { transition-delay: 0.06s; }
   .js .service-card.reveal:nth-child(3) { transition-delay: 0.12s; }

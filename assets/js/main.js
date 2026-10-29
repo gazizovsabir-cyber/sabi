@@ -47,7 +47,6 @@
   var brand = config.brand || {};
   var hero = config.hero || {};
   var contacts = config.contacts || {};
-  var formConfig = config.form || {};
   var sections = config.sections || {};
 
   var content = {
@@ -110,7 +109,6 @@
     var desc = $('meta[name="description"]');
     if (desc && content["hero.subtitle"]) desc.setAttribute("content", content["hero.subtitle"]);
 
-    $$("[data-privacy-link]").forEach(function (a) { a.href = formConfig.privacyUrl || "privacy.html"; });
     $$("[data-year]").forEach(function (n) { n.textContent = new Date().getFullYear(); });
   }
 
@@ -244,16 +242,6 @@
       });
     }
 
-    $$("[data-service-select]").forEach(function (select) {
-      services.forEach(function (s) {
-        var opt = el("option", null, s.title);
-        opt.value = s.title;
-        select.appendChild(opt);
-      });
-      var other = el("option", null, "Пока не знаю, нужна консультация");
-      other.value = "Консультация";
-      select.appendChild(other);
-    });
   }
 
   function setupCarousel(track) {
@@ -277,6 +265,76 @@
     track.addEventListener("scroll", update, { passive: true });
     window.addEventListener("resize", update);
     update();
+  }
+
+  /* ---------- Акции ---------- */
+
+  var months = ["января", "февраля", "марта", "апреля", "мая", "июня", "июля", "августа", "сентября", "октября", "ноября", "декабря"];
+
+  function renderPromos() {
+    var grid = $("[data-promos]");
+    if (!grid) return;
+    var d = new Date();
+    var today = d.getFullYear() + "-" + String(d.getMonth() + 1).padStart(2, "0") + "-" + String(d.getDate()).padStart(2, "0");
+    // Закончившаяся акция пропадает сама на следующий день после until.
+    var promos = (config.promos || []).filter(function (p) { return p && (!p.until || p.until >= today); });
+    if (!promos.length) { $$('[data-section="promos"], [data-section-link="promos"]').forEach(function (n) { n.remove(); }); return; }
+
+    promos.forEach(function (p, i) {
+      var li = el("li", "promo reveal" + (i === 0 ? " promo--accent" : "") + (p.image ? " promo--photo" : ""));
+      // У карточки с фото текст и фото стоят рядом, поэтому текст собран в отдельный блок.
+      var body = p.image ? el("div", "promo__body") : li;
+      if (body !== li) li.appendChild(body);
+      body.appendChild(el("h3", "promo__title", p.title));
+
+      var list = el("dl", "promo__offers");
+      (p.offers || []).forEach(function (o) {
+        var row = el("div", "promo__offer");
+        row.appendChild(el("dt", "promo__value", o[0]));
+        row.appendChild(el("dd", "promo__cond", o[1]));
+        list.appendChild(row);
+      });
+      body.appendChild(list);
+
+      if (p.extra) {
+        var extra = el("p", "promo__extra");
+        extra.appendChild(icon("gift"));
+        extra.appendChild(document.createTextNode(p.extra));
+        body.appendChild(extra);
+      }
+      if (p.text) body.appendChild(el("p", "promo__text", p.text));
+      if (p.image) {
+        var media = el("div", "promo__media");
+        var img = el("img");
+        img.src = p.image;
+        img.alt = p.imageAlt || "";
+        img.loading = "lazy";
+        if (p.imagePosition) img.style.objectPosition = p.imagePosition;
+        media.appendChild(img);
+        li.appendChild(media);
+      }
+
+      var foot = el("div", "promo__foot");
+      if (p.until) {
+        var parts = p.until.split("-");
+        var until = el("p", "promo__until");
+        until.appendChild(icon("calendar"));
+        until.appendChild(document.createTextNode("До " + +parts[2] + " " + months[+parts[1] - 1] + " " + parts[0]));
+        foot.appendChild(until);
+      }
+      var cta = el("a", "btn " + (i === 0 ? "btn--light" : "btn--dark") + " promo__cta");
+      cta.href = sections.booking === false ? "#contacts" : "#booking";
+      cta.setAttribute("data-book-service", p.service || "");
+      cta.setAttribute("data-book-comment", "Акция: " + p.title);
+      cta.appendChild(document.createTextNode("Записаться по акции"));
+      var chip = el("span", "btn__chip");
+      chip.appendChild(icon("arrow"));
+      cta.appendChild(chip);
+      foot.appendChild(cta);
+      li.appendChild(foot);
+
+      grid.appendChild(li);
+    });
   }
 
   /* ---------- Цены ---------- */
@@ -365,10 +423,10 @@
   }
   function messengerLinks() {
     var list = [];
-    if (contacts.telegram) list.push({ label: "Telegram", href: "https://t.me/" + contacts.telegram.replace(/^@/, ""), icon: "chat" });
-    if (contacts.whatsapp) list.push({ label: "WhatsApp", href: "https://wa.me/" + contacts.whatsapp.replace(/\D/g, ""), icon: "chat" });
+    if (contacts.max) list.push({ label: "MAX", href: contacts.max, icon: "max" });
+    if (contacts.whatsapp) list.push({ label: "WhatsApp", href: "https://wa.me/" + contacts.whatsapp.replace(/\D/g, ""), icon: "whatsapp" });
+    if (contacts.telegram) list.push({ label: "Telegram", href: "https://t.me/" + contacts.telegram.replace(/^@/, ""), icon: "telegram" });
     if (contacts.vk) list.push({ label: "ВКонтакте", href: contacts.vk, icon: "chat" });
-    if (contacts.max) list.push({ label: "MAX", href: contacts.max, icon: "chat" });
     return list;
   }
   function routeUrl() {
@@ -485,25 +543,29 @@
       });
     }
 
-    var alt = $("[data-booking-alt]");
-    if (alt) {
-      var altLinks = messengers.slice();
-      if (phone) altLinks.unshift({ label: "Позвонить", href: phone, icon: "phone" });
-      if (altLinks.length) {
-        alt.appendChild(el("p", "booking__alt-title", "Или напишите нам напрямую"));
-        var row = el("div", "booking__alt-links");
-        altLinks.forEach(function (l) {
-          var link = el("a", "alt-link");
-          link.href = l.href;
-          if (l.href.indexOf("http") === 0) { link.target = "_blank"; link.rel = "noopener"; }
-          link.appendChild(icon(l.icon));
-          link.appendChild(document.createTextNode(l.label));
-          row.appendChild(link);
-        });
-        alt.appendChild(row);
-      } else {
-        alt.remove();
-      }
+    // Запись: по крупной кнопке на каждый мессенджер и звонок. Сайт не собирает данные — человек пишет сам.
+    var channels = $("[data-booking-channels]");
+    if (channels) {
+      var ways = messengers.map(function (m) { return { name: m.label, hint: "Написать в " + m.label, href: m.href, icon: m.icon }; });
+      if (phone) ways.push({ name: phoneText, hint: "Позвонить", href: phone, icon: "phone" });
+      if (contacts.onlineBooking) ways.unshift({ name: "Записаться онлайн", hint: "Сами выберите мастера, услугу и время", href: contacts.onlineBooking, icon: "calendar", primary: true });
+      ways.forEach(function (c) {
+        var link = el("a", "channel" + (c.primary ? " channel--primary" : ""));
+        link.href = c.href;
+        if (c.href.indexOf("http") === 0) { link.target = "_blank"; link.rel = "noopener"; }
+        var mark = el("span", "channel__icon");
+        mark.appendChild(icon(c.icon));
+        link.appendChild(mark);
+        var text = el("span", "channel__text");
+        text.appendChild(el("span", "channel__name", c.name));
+        text.appendChild(el("span", "channel__hint", c.hint));
+        link.appendChild(text);
+        var chip = el("span", "btn__chip");
+        chip.appendChild(icon("arrow"));
+        link.appendChild(chip);
+        channels.appendChild(link);
+      });
+      if (!ways.length) channels.appendChild(el("p", "booking__lead", "Контакты для записи скоро появятся."));
     }
   }
 
@@ -560,352 +622,6 @@
       });
     }, { rootMargin: "0px 0px -8% 0px", threshold: 0.08 });
     items.forEach(function (n) { io.observe(n); });
-  }
-
-  /* ---------- Форма записи ---------- */
-
-  var form = $("[data-booking-form]");
-
-  function goToForm(values) {
-    var target = document.getElementById("booking");
-    if (!form || !target) return;
-    Object.keys(values || {}).forEach(function (name) {
-      if (name === "time") { if (values.time) setSlot(values.time); return; }
-      var field = form.elements[name];
-      if (field && values[name]) {
-        field.value = values[name];
-        field.classList.toggle("has-value", !!field.value);
-        clearError(field);
-        field.dispatchEvent(new Event("change", { bubbles: true })); // дата влияет на доступное время
-      }
-    });
-    target.scrollIntoView({ behavior: matchMedia("(prefers-reduced-motion: reduce)").matches ? "auto" : "smooth" });
-    setTimeout(function () { form.elements.name.focus({ preventScroll: true }); }, 600);
-  }
-
-  function setupBookingLinks() {
-    document.addEventListener("click", function (e) {
-      var link = e.target.closest("[data-book-service]");
-      if (!link || !form) return;
-      e.preventDefault();
-      goToForm({ service: link.getAttribute("data-book-service") });
-    });
-
-    var qb = $("[data-quickbook]");
-    if (qb) {
-      if (!form) { qb.remove(); return; }
-      qb.addEventListener("submit", function (e) {
-        e.preventDefault();
-        goToForm({ service: qb.elements.service.value, date: qb.elements.date.value, time: qb.elements.time.value });
-      });
-    }
-  }
-
-  function setupDates() {
-    var d = new Date();
-    var today = d.getFullYear() + "-" + String(d.getMonth() + 1).padStart(2, "0") + "-" + String(d.getDate()).padStart(2, "0");
-    $$("[data-min-today]").forEach(function (input) {
-      input.min = today;
-      var sync = function () { input.classList.toggle("has-value", !!input.value); };
-      input.addEventListener("input", sync);
-      input.addEventListener("change", sync);
-    });
-  }
-
-  /* ---------- Выбор времени: окна по 15 минут ---------- */
-
-  var slotsConfig = formConfig.slots || {};
-  var setSlot = function () {};
-
-  function toMinutes(t) { var p = String(t).split(":"); return +p[0] * 60 + (+p[1] || 0); }
-  function toTime(m) { return String(Math.floor(m / 60)).padStart(2, "0") + ":" + String(m % 60).padStart(2, "0"); }
-
-  // Окна «12:00–12:15», разложенные по периодам утро / день / вечер.
-  function buildPeriods() {
-    var from = toMinutes(slotsConfig.from || "10:00");
-    var to = toMinutes(slotsConfig.to || "21:00");
-    var step = Math.max(5, +slotsConfig.step || 15);
-    var dayFrom = toMinutes(slotsConfig.dayFrom || "12:00");
-    var eveningFrom = toMinutes(slotsConfig.eveningFrom || "17:00");
-    var periods = [
-      { id: "morning", name: "Утро", start: from, end: Math.min(dayFrom, to) },
-      { id: "day", name: "День", start: Math.max(dayFrom, from), end: Math.min(eveningFrom, to) },
-      { id: "evening", name: "Вечер", start: Math.max(eveningFrom, from), end: to },
-    ];
-    return periods.filter(function (p) { return p.end - p.start >= step; }).map(function (p) {
-      p.slots = [];
-      for (var m = p.start; m + step <= p.end; m += step) {
-        p.slots.push({ start: m, label: toTime(m) + "–" + toTime(m + step), from: toTime(m), to: toTime(m + step) });
-      }
-      p.range = toTime(p.start) + "–" + toTime(p.end);
-      return p;
-    });
-  }
-
-  function setupSlots() {
-    var periods = buildPeriods();
-
-    // Быстрая запись под первым экраном: обычный список, сгруппированный по периодам.
-    $$("[data-slot-select]").forEach(function (select) {
-      periods.forEach(function (p) {
-        var group = el("optgroup");
-        group.label = p.name + " · " + p.range;
-        p.slots.forEach(function (sl) {
-          var opt = el("option", null, sl.label);
-          opt.value = sl.label;
-          group.appendChild(opt);
-        });
-        select.appendChild(group);
-      });
-    });
-
-    var box = $("[data-slots]");
-    if (!box || !form) return;
-    var tabs = $("[data-slot-periods]", box);
-    var groups = $("[data-slot-groups]", box);
-    var summary = $("[data-slot-summary]", box);
-    var reset = $("[data-slot-reset]", box);
-    var anyTime = $('input[name="time"][value=""]', box);
-    var dateInput = form.elements.date;
-    var current = null;
-
-    // Переключатель периода показывает один период за раз; сам выбор — обычные радиокнопки.
-    function showPeriod(id) {
-      current = id;
-      $$(".slots__period", tabs).forEach(function (b) { b.setAttribute("aria-pressed", String(b.dataset.period === id)); });
-      $$(".slots__group", groups).forEach(function (g) { g.hidden = g.dataset.period !== id; });
-    }
-
-    periods.forEach(function (p) {
-      var btn = el("button", "slots__period");
-      btn.type = "button";
-      btn.dataset.period = p.id;
-      btn.appendChild(el("span", "slots__period-name", p.name));
-      btn.appendChild(el("span", "slots__period-range", p.range));
-      btn.addEventListener("click", function () { showPeriod(p.id); });
-      tabs.appendChild(btn);
-
-      var grid = el("div", "slots__group");
-      grid.dataset.period = p.id;
-      grid.setAttribute("role", "group");
-      grid.setAttribute("aria-label", p.name + ", " + p.range);
-      p.slots.forEach(function (sl, i) {
-        var label = el("label", "slot");
-        label.style.setProperty("--i", i);
-        var input = el("input");
-        input.type = "radio";
-        input.name = "time";
-        input.value = sl.label;
-        input.dataset.start = sl.start;
-        label.appendChild(input);
-        var face = el("span", "slot__face");
-        face.appendChild(el("span", "slot__from", sl.from));
-        face.appendChild(el("span", "slot__to", "до " + sl.to));
-        label.appendChild(face);
-        grid.appendChild(label);
-      });
-      grid.appendChild(el("p", "slots__empty", "На сегодня это время уже прошло — выберите другой период или день."));
-      groups.appendChild(grid);
-    });
-
-    function sync() {
-      var checked = $('input[name="time"]:checked', box);
-      var value = checked ? checked.value : "";
-      summary.textContent = value ? "Вы выбрали " + value : "Любое время";
-      summary.classList.toggle("is-set", !!value);
-      reset.hidden = !value;
-    }
-
-    // Если выбран сегодняшний день, прошедшие окна недоступны.
-    function lockPast() {
-      var d = new Date();
-      var today = d.getFullYear() + "-" + String(d.getMonth() + 1).padStart(2, "0") + "-" + String(d.getDate()).padStart(2, "0");
-      var now = dateInput && dateInput.value === today ? d.getHours() * 60 + d.getMinutes() : -1;
-      $$(".slot input", box).forEach(function (input) {
-        input.disabled = +input.dataset.start <= now;
-        if (input.disabled && input.checked) anyTime.checked = true;
-      });
-      // Период, где все окна прошли, показывает пояснение; открытым остаётся период со свободным временем.
-      $$(".slots__group", groups).forEach(function (g) {
-        g.classList.toggle("is-past", !$(".slot input:not(:disabled)", g));
-      });
-      var open = $('.slots__group[data-period="' + current + '"]', groups);
-      if (open && open.classList.contains("is-past")) {
-        var free = $$(".slots__group", groups).filter(function (g) { return !g.classList.contains("is-past"); })[0];
-        if (free) showPeriod(free.dataset.period);
-      }
-      sync();
-    }
-
-    setSlot = function (value) {
-      var input = $$(".slot input", box).filter(function (i) { return i.value === value && !i.disabled; })[0];
-      if (!input) return;
-      input.checked = true;
-      showPeriod(input.closest(".slots__group").dataset.period);
-      sync();
-    };
-
-    box.addEventListener("change", sync);
-    reset.addEventListener("click", function () { anyTime.checked = true; sync(); });
-    if (dateInput) dateInput.addEventListener("change", lockPast);
-    form.addEventListener("reset", function () { setTimeout(lockPast); });
-
-    showPeriod(periods.some(function (p) { return p.id === "day"; }) ? "day" : periods[0] && periods[0].id);
-    lockPast();
-  }
-
-  var messages = {
-    name: "Укажите, как к вам обращаться.",
-    phone: "Укажите телефон, чтобы мы могли связаться с вами.",
-    phoneFormat: "Проверьте номер: в нём должно быть от 10 до 15 цифр, например +7 900 000-00-00.",
-    service: "Выберите услугу или вариант «Пока не знаю».",
-    consent: "Без согласия на обработку данных мы не можем принять заявку.",
-  };
-
-  function fieldWrap(field) { return field.closest(".field"); }
-
-  function showError(field, text) {
-    var wrap = fieldWrap(field);
-    var err = $(".field__error", wrap);
-    wrap.classList.add("is-invalid");
-    field.setAttribute("aria-invalid", "true");
-    if (err) err.textContent = text;
-  }
-
-  function clearError(field) {
-    var wrap = fieldWrap(field);
-    if (!wrap || !wrap.classList.contains("is-invalid")) return;
-    wrap.classList.remove("is-invalid");
-    field.removeAttribute("aria-invalid");
-    var err = $(".field__error", wrap);
-    if (err) err.textContent = "";
-  }
-
-  function validate() {
-    var f = form.elements;
-    var firstInvalid = null;
-    var mark = function (field, text) { showError(field, text); firstInvalid = firstInvalid || field; };
-    [f.name, f.phone, f.service, f.consent].forEach(clearError);
-
-    if (!f.name.value.trim()) mark(f.name, messages.name);
-
-    var digits = f.phone.value.replace(/\D/g, "");
-    if (!digits) mark(f.phone, messages.phone);
-    else if (digits.length < 10 || digits.length > 15 || /[^\d\s()+\-]/.test(f.phone.value)) mark(f.phone, messages.phoneFormat);
-
-    if (!f.service.value) mark(f.service, messages.service);
-    if (!f.consent.checked) mark(f.consent, messages.consent);
-
-    if (firstInvalid) firstInvalid.focus();
-    return !firstInvalid;
-  }
-
-  function status(kind, title, lines) {
-    var box = $("[data-form-status]");
-    box.className = "form__status" + (kind ? " form__status--" + kind : "");
-    box.textContent = "";
-    if (!title) return;
-    box.appendChild(el("strong", null, title));
-    (lines || []).forEach(function (line) {
-      if (typeof line === "string") box.appendChild(el("p", null, line));
-      else box.appendChild(line);
-    });
-  }
-
-  function notConnectedMessage() {
-    if (demo) {
-      var p = el("p");
-      p.appendChild(document.createTextNode("Это демо-шаблон: заявка проверена, но никуда не отправлена. Чтобы форма заработала, укажите адрес обработчика в "));
-      p.appendChild(el("code", null, "config.js → form.endpoint"));
-      p.appendChild(document.createTextNode(". Инструкция — в README.md."));
-      return ["Отправка заявок пока не подключена", [p]];
-    }
-    var lines = ["Онлайн-заявки временно не принимаются. Пожалуйста, свяжитесь с нами по телефону или в мессенджере."];
-    if (contacts.phone) {
-      var call = el("p");
-      var a = el("a", null, contacts.phoneDisplay || contacts.phone);
-      a.href = phoneLink();
-      call.appendChild(document.createTextNode("Телефон: "));
-      call.appendChild(a);
-      lines.push(call);
-    }
-    return ["Заявка не отправлена", lines];
-  }
-
-  function setupForm() {
-    if (!form) return;
-    var submit = $("[data-submit]", form);
-    var submitText = $("[data-submit-text]", form);
-    var sending = false;
-
-    form.addEventListener("input", function (e) { clearError(e.target); });
-    form.addEventListener("change", function (e) { clearError(e.target); });
-
-    form.addEventListener("submit", function (e) {
-      e.preventDefault();
-      if (sending) return;
-      status(null);
-      if (!validate()) return;
-
-      // Заполненное скрытое поле = бот. Делаем вид, что всё хорошо, и ничего не отправляем.
-      if (form.elements.website.value) { form.reset(); return; }
-
-      var endpoint = (formConfig.endpoint || "").trim();
-      if (!endpoint) {
-        var msg = notConnectedMessage();
-        status("error", msg[0], msg[1]);
-        return;
-      }
-
-      var f = form.elements;
-      var payload = {
-        name: f.name.value.trim(),
-        phone: f.phone.value.trim(),
-        contactMethod: f.contactMethod.value,
-        service: f.service.value,
-        date: f.date.value,
-        time: f.time.value,
-        comment: f.comment.value.trim(),
-        consent: true,
-        page: location.href,
-      };
-
-      sending = true;
-      submit.disabled = true;
-      submit.classList.add("is-loading");
-      submitText.textContent = "Отправляем…";
-
-      var controller = "AbortController" in window ? new AbortController() : null;
-      var timer = controller ? setTimeout(function () { controller.abort(); }, 15000) : null;
-
-      fetch(endpoint, {
-        method: "POST",
-        headers: { "Content-Type": "application/json", Accept: "application/json" },
-        body: JSON.stringify(payload),
-        signal: controller ? controller.signal : undefined,
-      })
-        .then(function (res) {
-          if (!res.ok) throw new Error("HTTP " + res.status);
-          form.reset();
-          $$(".has-value", form).forEach(function (n) { n.classList.remove("has-value"); });
-          status("success", "Заявка отправлена", ["Спасибо! Мы свяжемся с вами в ближайшее время, чтобы уточнить детали."]);
-        })
-        .catch(function (err) {
-          var reason = "Не удалось отправить заявку. Проверьте интернет и попробуйте ещё раз.";
-          if (err && err.name === "AbortError") reason = "Сервер слишком долго не отвечает. Попробуйте ещё раз.";
-          else if (err && /^HTTP/.test(err.message)) reason = "Сервер не принял заявку. Попробуйте ещё раз чуть позже.";
-          var lines = [reason];
-          if (contacts.phone) lines.push("Или позвоните нам: " + (contacts.phoneDisplay || contacts.phone));
-          status("error", "Заявка не отправлена", lines);
-        })
-        .then(function () {
-          if (timer) clearTimeout(timer);
-          sending = false;
-          submit.disabled = false;
-          submit.classList.remove("is-loading");
-          submitText.textContent = "Отправить заявку";
-        });
-    });
   }
 
   /* ---------- Демо-панель ---------- */
@@ -983,15 +699,12 @@
   applyContent();
   applySections();
   prepareWordmarks();
+  renderPromos();
   renderServices();
   renderPrices();
   renderGallery();
   renderContacts();
   setupHeader();
-  setupBookingLinks();
-  setupDates();
-  setupSlots();
-  setupForm();
   setupDemoBar();
   setupReveal();
 

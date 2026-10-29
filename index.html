@@ -14,8 +14,8 @@
   <link rel="preload" href="assets/fonts/cormorant-garamond-cyrillic.woff2" as="font" type="font/woff2" crossorigin>
   <link rel="preload" href="assets/fonts/manrope-cyrillic.woff2" as="font" type="font/woff2" crossorigin>
   <!-- ?v= — номер версии файлов. При каждом обновлении сайта меняйте его во всех ссылках, чтобы браузеры посетителей сразу взяли новые стили и скрипты. -->
-  <link rel="stylesheet" href="assets/css/fonts.css?v=20261029-3">
-  <link rel="stylesheet" href="assets/css/styles.css?v=20261029-3">
+  <link rel="stylesheet" href="assets/css/fonts.css?v=20261029-9">
+  <link rel="stylesheet" href="assets/css/styles.css?v=20261029-9">
   <script>document.documentElement.classList.add("js", "is-booting");</script>
 </head>
 <body>
@@ -30,7 +30,11 @@
     <symbol id="i-clock" viewBox="0 0 24 24"><circle cx="12" cy="12" r="8"/><path d="M12 7.5V12l3 2"/></symbol>
     <symbol id="i-pin" viewBox="0 0 24 24"><path d="M12 21s-6.5-5.6-6.5-11a6.5 6.5 0 0113 0C18.5 15.4 12 21 12 21z"/><circle cx="12" cy="10" r="2.3"/></symbol>
     <symbol id="i-phone" viewBox="0 0 24 24"><path d="M6.5 3.5h3l1.5 4-2 1.3a10 10 0 005.2 5.2l1.3-2 4 1.5v3a2 2 0 01-2.2 2A16 16 0 014.5 5.7a2 2 0 012-2.2z"/></symbol>
-    <symbol id="i-chat" viewBox="0 0 24 24"><path d="M20 12a7.5 7.5 0 01-11 6.6L4.5 20l1.4-4.3A7.5 7.5 0 1120 12z"/></symbol>
+    <symbol id="i-whatsapp" viewBox="0 0 24 24"><path d="M12 3.5a8.5 8.5 0 00-7.3 12.8L3.5 20.5l4.3-1.1A8.5 8.5 0 1012 3.5z"/><path d="M9 8.2c.3-.3.8-.3 1 .1l.8 1.5c.2.3.1.6-.1.9l-.6.6a5.2 5.2 0 002.6 2.6l.6-.6c.3-.2.6-.3.9-.1l1.5.8c.4.2.4.7.1 1-.9.9-2.2 1.1-3.6.3a8.4 8.4 0 01-3.5-3.5c-.8-1.4-.6-2.7.3-3.6z"/></symbol>
+    <symbol id="i-telegram" viewBox="0 0 24 24"><path d="M20.5 4.5L3.5 11l5.5 2.2 8.5-6.2-6.5 7.4 6.5 5.1 3-15z"/><path d="M9 13.2v5.3l2.8-2.6"/></symbol>
+    <symbol id="i-max" viewBox="0 0 24 24"><path d="M12 3.5a8.5 8.5 0 110 17H3.5V12A8.5 8.5 0 0112 3.5z"/><circle cx="12" cy="12" r="3.2"/></symbol>
+    <symbol id="i-chat"viewBox="0 0 24 24"><path d="M20 12a7.5 7.5 0 01-11 6.6L4.5 20l1.4-4.3A7.5 7.5 0 1120 12z"/></symbol>
+    <symbol id="i-gift" viewBox="0 0 24 24"><rect x="4" y="8.5" width="16" height="4" rx="1"/><path d="M5.5 12.5V19a1.5 1.5 0 001.5 1.5h10a1.5 1.5 0 001.5-1.5v-6.5M12 8.5v12M12 8.5S10.8 4 8.5 4a2.2 2.2 0 000 4.5H12zM12 8.5S13.2 4 15.5 4a2.2 2.2 0 010 4.5H12z"/></symbol>
   </svg>
 
   <a class="skip-link" href="#main">Перейти к содержанию</a>
@@ -55,6 +59,7 @@
       <nav class="nav" aria-label="Основное меню">
         <ul class="nav__list">
           <li><a href="#top">Главная</a></li>
+          <li data-section-link="promos"><a href="#promos">Акции</a></li>
           <li data-section-link="services"><a href="#services">Услуги</a></li>
           <li data-section-link="prices"><a href="#prices">Цены</a></li>
           <li data-section-link="gallery"><a href="#gallery">Наши работы</a></li>
@@ -73,7 +78,8 @@
     <div class="mobile-menu" id="mobile-menu" hidden data-menu>
       <ul class="mobile-menu__list">
         <li><a href="#top">Главная</a></li>
-        <li data-section-link="services"><a href="#services">Услуги</a></li>
+        <li data-section-link="promos"><a href="#promos">Акции</a></li>
+          <li data-section-link="services"><a href="#services">Услуги</a></li>
         <li data-section-link="prices"><a href="#prices">Цены</a></li>
         <li data-section-link="gallery"><a href="#gallery">Наши работы</a></li>
         <li data-section-link="contacts"><a href="#contacts">Контакты</a></li>
@@ -114,6 +120,17 @@
         </div>
 
         <a class="photo-credit" data-credit="hero.image" href="https://unsplash.com/photos/OKXwmdbdXkk" target="_blank" rel="noopener">Фото для примера</a>
+      </div>
+    </section>
+
+    <section class="section promos" id="promos" data-section="promos" aria-labelledby="promos-title">
+      <div class="container">
+        <div class="section-head">
+          <div>
+            <h2 class="section-title" id="promos-title">Акции <em>и скидки</em></h2>
+          </div>
+        </div>
+        <ul class="promos__grid" data-promos></ul>
       </div>
     </section>
 
@@ -164,77 +181,10 @@
         <div class="booking__card">
           <div class="booking__intro">
             <h2 class="section-title" id="booking-title">Запишитесь <em>на удобное время</em></h2>
-            <p class="booking__lead">Оставьте заявку, и мы свяжемся с вами для уточнения деталей.</p>
-            <div class="booking__alt" data-booking-alt></div>
+            <p class="booking__lead">Выберите мастера и время онлайн — или напишите нам в мессенджер, поможем с записью.</p>
           </div>
 
-          <form class="form" data-booking-form novalidate>
-            <div class="form__grid">
-              <div class="field">
-                <label for="f-name">Имя</label>
-                <input id="f-name" name="name" type="text" autocomplete="name" required maxlength="60" aria-describedby="f-name-err">
-                <p class="field__error" id="f-name-err"></p>
-              </div>
-              <div class="field">
-                <label for="f-phone">Телефон</label>
-                <input id="f-phone" name="phone" type="tel" inputmode="tel" autocomplete="tel" placeholder="+7 900 000-00-00" required maxlength="22" aria-describedby="f-phone-err">
-                <p class="field__error" id="f-phone-err"></p>
-              </div>
-              <fieldset class="field field--wide">
-                <legend>Как с вами связаться</legend>
-                <div class="chips">
-                  <label class="chip"><input type="radio" name="contactMethod" value="Звонок" checked><span>Звонок</span></label>
-                  <label class="chip"><input type="radio" name="contactMethod" value="Telegram"><span>Telegram</span></label>
-                  <label class="chip"><input type="radio" name="contactMethod" value="WhatsApp"><span>WhatsApp</span></label>
-                  <label class="chip"><input type="radio" name="contactMethod" value="MAX"><span>MAX</span></label>
-                </div>
-              </fieldset>
-              <div class="field field--wide">
-                <label for="f-service">Услуга</label>
-                <select id="f-service" name="service" required data-service-select aria-describedby="f-service-err">
-                  <option value="">Выберите услугу</option>
-                </select>
-                <p class="field__error" id="f-service-err"></p>
-              </div>
-              <div class="field field--wide">
-                <label for="f-date">Желаемая дата <span class="field__opt">необязательно</span></label>
-                <input id="f-date" name="date" type="date" data-min-today>
-              </div>
-              <fieldset class="field field--wide slots" data-slots>
-                <legend>Удобное время <span class="field__opt">необязательно</span></legend>
-                <!-- Периоды и окна по 15 минут строятся из config.js → form.slots -->
-                <div class="slots__periods" data-slot-periods></div>
-                <input class="visually-hidden" type="radio" name="time" value="" checked tabindex="-1" aria-hidden="true">
-                <div data-slot-groups></div>
-                <p class="slots__summary" aria-live="polite">
-                  <span data-slot-summary>Любое время</span>
-                  <button class="slots__reset" type="button" data-slot-reset hidden>Сбросить</button>
-                </p>
-                <p class="slots__note">Это желаемое время — администратор подтвердит его, когда свяжется с вами.</p>
-              </fieldset>
-              <div class="field field--wide">
-                <label for="f-comment">Комментарий <span class="field__opt">необязательно</span></label>
-                <textarea id="f-comment" name="comment" rows="3" maxlength="500"></textarea>
-              </div>
-              <div class="field field--wide hp" aria-hidden="true">
-                <label for="f-website">Не заполняйте это поле</label>
-                <input id="f-website" name="website" type="text" tabindex="-1" autocomplete="off">
-              </div>
-              <div class="field field--wide">
-                <label class="consent">
-                  <input type="checkbox" name="consent" required aria-describedby="f-consent-err">
-                  <span>Я согласен(на) на обработку персональных данных в соответствии с <a href="privacy.html" target="_blank" rel="noopener" data-privacy-link>политикой конфиденциальности</a></span>
-                </label>
-                <p class="field__error" id="f-consent-err"></p>
-              </div>
-            </div>
-
-            <button class="btn btn--light btn--submit" type="submit" data-submit>
-              <span data-submit-text>Отправить заявку</span>
-              <span class="btn__chip"><svg class="icon"><use href="#i-arrow"/></svg></span>
-            </button>
-            <div class="form__status" role="status" aria-live="polite" data-form-status></div>
-          </form>
+          <div class="booking__channels" data-booking-channels></div>
         </div>
       </div>
     </section>
@@ -260,7 +210,8 @@
       <div class="footer__row">
         <nav aria-label="Разделы сайта">
           <ul class="footer__links">
-            <li data-section-link="services"><a href="#services">Услуги</a></li>
+            <li data-section-link="promos"><a href="#promos">Акции</a></li>
+          <li data-section-link="services"><a href="#services">Услуги</a></li>
             <li data-section-link="prices"><a href="#prices">Цены</a></li>
             <li data-section-link="gallery"><a href="#gallery">Наши работы</a></li>
             <li data-section-link="booking"><a href="#booking">Запись</a></li>
@@ -271,7 +222,6 @@
       </div>
       <div class="footer__bottom">
         <p>© <span data-year></span> <span data-c="brand.name">Название студии</span></p>
-        <a href="privacy.html" data-privacy-link>Политика обработки персональных данных</a>
       </div>
     </div>
   </footer>
@@ -281,8 +231,8 @@
     <button class="round-btn lightbox__close" type="button" data-lightbox-close aria-label="Закрыть просмотр"><svg class="icon"><use href="#i-close"/></svg></button>
   </dialog>
 
-  <script src="assets/js/config.js?v=20261029-3"></script>
-  <script src="assets/js/presets.js?v=20261029-3"></script>
-  <script src="assets/js/main.js?v=20261029-3"></script>
+  <script src="assets/js/config.js?v=20261029-9"></script>
+  <script src="assets/js/presets.js?v=20261029-9"></script>
+  <script src="assets/js/main.js?v=20261029-9"></script>
 </body>
 </html>
