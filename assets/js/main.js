@@ -344,10 +344,9 @@
     if (!grid) return;
     var groups = config.priceList || [];
     if (!groups.length) { $$('[data-section="prices"], [data-section-link="prices"]').forEach(function (n) { n.remove(); }); return; }
-    groups.forEach(function (g, i) {
+    groups.forEach(function (g) {
       // Раскрывающиеся блоки: на телефоне прайс не растягивается на десятки экранов.
       var box = el("details", "price-group reveal");
-      if (i === 0) box.open = true;
       var summary = el("summary", "price-group__head");
       summary.appendChild(el("span", "price-group__title", g.title));
       summary.appendChild(el("span", "price-group__toggle"));
